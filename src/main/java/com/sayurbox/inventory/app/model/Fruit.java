@@ -9,6 +9,11 @@ public class Fruit {
     private String color;
     private String farmLocation;
 
+    public Fruit(String name, String farmLocation){
+        this.name = name;
+        this.farmLocation = farmLocation;
+    }
+
     public String getName() {
         return name;
     }

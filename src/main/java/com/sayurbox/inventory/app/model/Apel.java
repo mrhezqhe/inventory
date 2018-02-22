@@ -5,6 +5,10 @@ package com.sayurbox.inventory.app.model;
  */
 public class Apel extends Fruit {
 
+    public Apel(String name, String farmLocation) {
+        super(name, farmLocation);
+    }
+
     public String getFlavour() {
         return flavour;
     }

@@ -5,6 +5,10 @@ package com.sayurbox.inventory.app.model;
  */
 public class Pepaya extends Fruit {
 
+    public Pepaya(String name, String farmLocation) {
+        super(name, farmLocation);
+    }
+
     public String getFlavour() {
         return flavour;
     }
