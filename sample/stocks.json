@@ -1,0 +1,21 @@
+{
+	"stock": {
+		"items": [{
+				"fruit": "Apel",
+				"category": "Fruit",
+				"total": 5
+			},
+			{
+				"fruit": "Pepaya",
+				"category": "Fruit",
+				"total": 1
+			},
+			{
+				"fruit": "Mangga",
+				"category": "Fruit",
+				"total": 4
+			}
+		],
+        "warehouse":"jakarta"
+	}
+}

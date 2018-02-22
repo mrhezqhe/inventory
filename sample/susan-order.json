@@ -1,0 +1,16 @@
+{
+	"order": {
+		"items": [{
+				"fruit": "Apel",
+				"category": "Fruit",
+				"total": 5
+			},
+			{
+				"fruit": "Pepaya",
+				"category": "Fruit",
+				"total": 1
+			}
+		]
+	},
+	"customerId": "susan"
+}

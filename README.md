@@ -1,2 +1,2 @@
-# inventory
-An overview about inventory concurrency solution. 
+# inventory app
+An overview about inventory concurrency problem.
