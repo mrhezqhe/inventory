@@ -1,3 +1,14 @@
+
+Usage Instructions :
+
+- provided sample data for easy simulation
+- provided test scenario in JUnit for easy customization
+- inside "dist-jar" folder, run
+
+- #java -jar InventoryApp-1.0-jar-with-dependencies.jar
+- or, open with your favorite IDE then run main class [InventoryMain].
+
+
 Steps :
 1.  Identify sample data
 2.  Initialize data
@@ -17,4 +28,7 @@ Scenarios :
 4. Assigning back to stock, if available
 5. Check Stock Status
 
-Hints : Try to changing total item when ordering. order total less than cart total.
+Hints : Try to change total item when ordering, order total less than cart total.
+
+Happy Coding :)
+~mrhezqhe
