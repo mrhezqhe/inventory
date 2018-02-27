@@ -1,6 +1,7 @@
 package com.sayurbox.inventory.app;
 
 import com.google.gson.Gson;
+import com.sayurbox.inventory.app.common.XConstants;
 import com.sayurbox.inventory.app.model.*;
 import org.apache.log4j.Logger;
 import org.junit.*;
@@ -9,8 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author mrhezqhez@gmail.com
@@ -32,6 +32,11 @@ public class InventoryMainTest {
     private String susanOrder;
     private String mandaOrder;
 
+    private HashSet<Stock> lastStock = new HashSet<Stock>();
+    private LinkedHashSet<Stock> availableStocks = new LinkedHashSet<Stock>();
+    private LinkedHashSet<List<Item>> selectedMandaCart = new LinkedHashSet<List<Item>>();
+    private LinkedHashSet<List<Item>> selectedSusanCart = new LinkedHashSet<List<Item>>();
+
     public InventoryMainTest() {}
 
     @BeforeClass
@@ -52,17 +57,19 @@ public class InventoryMainTest {
 
             String contentStock = new String(Files.readAllBytes(Paths.get(stockFile)));
             initalStock = gson.fromJson(contentStock, Stock.class);
+            availableStocks.add(initalStock);
+            lastStock.add(initalStock);
             System.out.println("sample stock data object : "+initalStock);
 
             mandaCart = new String(Files.readAllBytes(Paths.get(mandaCartFile)));
-            System.out.println("mandaCart : "+mandaCart);
+            System.out.println("mandaCart = "+mandaCart);
             susanCart = new String(Files.readAllBytes(Paths.get(susanCartFile)));
-            System.out.println("susanCart : "+susanCart);
+            System.out.println("susanCart = "+susanCart);
 
             mandaOrder = new String(Files.readAllBytes(Paths.get(mandaOrderFile)));
-            System.out.println("mandaOrder : "+mandaOrder);
+            System.out.println("mandaOrder = "+mandaOrder);
             susanOrder = new String(Files.readAllBytes(Paths.get(susanOrderFile)));
-            System.out.println("susanOrder : "+susanOrder);
+            System.out.println("susanOrder = "+susanOrder);
 
             initalContentStock = gson.toJson(initalStock);
             System.out.println("sample stock data content : "+initalContentStock);
@@ -76,7 +83,7 @@ public class InventoryMainTest {
     public void tearDown() {}
 
     @Test
-    public void selectingScenario() throws Exception {
+    public void selectingSampleScenario() throws Exception {
         try {
             log.debug("selecting scenario");
 
@@ -85,24 +92,24 @@ public class InventoryMainTest {
 
             Item itemApple = new Item();
             itemApple.setFruit(new Apel("Apel", "Malang"));
-            itemApple.setCategory("Fruit");
+            itemApple.setCategory(XConstants.CATEGORY_ITEM_FRUIT);
             itemApple.setTotal(5);
             items.add(itemApple);
 
             Item itemPepaya = new Item();
             itemPepaya.setFruit(new Pepaya("Pepaya", "California"));
-            itemPepaya.setCategory("Fruit");
+            itemPepaya.setCategory(XConstants.CATEGORY_ITEM_FRUIT);
             itemPepaya.setTotal(1);
             items.add(itemPepaya);
 
             Item itemMangga = new Item();
             itemMangga.setFruit(new Mangga("Mangga", "Indramayu"));
-            itemMangga.setCategory("Fruit");
+            itemMangga.setCategory(XConstants.CATEGORY_ITEM_FRUIT);
             itemMangga.setTotal(4);
             items.add(itemMangga);
 
             newStock.setItems(items);
-            newStock.setWarehouse("jakarta");
+            newStock.setWarehouse("Jakarta");
 
             String output = gson.toJson(newStock);
             System.out.println("result : "+output);
@@ -120,8 +127,274 @@ public class InventoryMainTest {
             String warehouse = responseStock.getWarehouse();
             System.out.println("warehouse : "+warehouse);
 
+            //start selecting
+            Cart newCart = new Cart();
+            List<Order> mandaItems = new ArrayList<>();
+            Order mandaItem1 = new Order();
+            mandaItem1.setName("Apple");
+            mandaItem1.setCategory(XConstants.CATEGORY_ITEM_FRUIT);
+            mandaItem1.setTotal(2);
+            mandaItems.add(mandaItem1);
+
+            Order mandaItem2 = new Order();
+            mandaItem2.setName("Mangga");
+            mandaItem2.setCategory(XConstants.CATEGORY_ITEM_FRUIT);
+            mandaItem2.setTotal(4);
+            mandaItems.add(mandaItem2);
+
+            newCart.setCart(mandaItems);
+            newCart.setCustomerId(new User("manda"));
+            newCart.setActionType(XConstants.ACTION_CART);
+
+            String outputnewCart = gson.toJson(newCart);
+            System.out.println("result outputnewCart : "+outputnewCart);
+
+            Cart mandaSelectedItems = gson.fromJson(mandaCart, Cart.class);
+            Cart susanSelectedItems = gson.fromJson(susanCart, Cart.class);
+
         }catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    public Iterator<Stock> checkStockNew(List<Item> progressItems, List<Item> selectedItems, List<Item> progressIdleItems, Order c){
+        //iterate over stock here
+        Iterator<Stock> iterStock = availableStocks.iterator();
+        while (iterStock.hasNext()) {
+            Stock stock = (Stock) iterStock.next();
+            Iterator<Item> iterItem = stock.getItems().iterator();
+            while (iterItem.hasNext()) {
+                Item item = (Item) iterItem.next();
+                int currentSelectedStock = item.getTotal();
+                String category = item.getCategory();
+                String name = item.getFruit().getName();
+                if(category.equalsIgnoreCase(c.getCategory()) && name.equalsIgnoreCase(c.getName())){
+                    if(item.isInStock()){
+                        //deduct the stock here
+                        int totalAvailableCart = 0;
+                        if(c.getTotal() > currentSelectedStock){
+                            totalAvailableCart = c.getTotal() - currentSelectedStock;
+                            currentSelectedStock = 0;
+                        } else {
+                            currentSelectedStock = currentSelectedStock - c.getTotal();
+                        }
+
+                        //checking into new list
+                        Item updatedItem = new Item();
+                        updatedItem.setCategory(category);
+                        updatedItem.setFruit(item.getFruit());
+                        updatedItem.setTotal(currentSelectedStock);
+                        if(currentSelectedStock <= 0){
+                            updatedItem.setInStock(false);
+                        }
+                        progressItems.add(updatedItem);
+
+                        //add into user
+                        updatedItem = new Item();
+                        updatedItem.setCategory(category);
+                        updatedItem.setFruit(item.getFruit());
+                        updatedItem.setTotal(c.getTotal() - totalAvailableCart);
+                        selectedItems.add(updatedItem);
+
+                        break;
+                    }
+                } else {
+                    //check if previous item already there
+                    Iterator<Item> iter = progressItems.iterator();
+                    while (iter.hasNext()) {
+                        Item it = (Item) iter.next();
+                        if(!name.equalsIgnoreCase(it.getFruit().getName())){
+                            //checking into new list
+                            Item updatedItem = new Item();
+                            updatedItem.setCategory(category);
+                            updatedItem.setFruit(item.getFruit());
+                            updatedItem.setInStock(item.isInStock());
+                            updatedItem.setTotal(currentSelectedStock);
+                            progressIdleItems.add(updatedItem);
+                        }
+                    }
+                }
+            }
+        }
+        return iterStock;
+    }
+
+    public void checkStock(List<Item> progressItems, List<Item> progressIdleItems, Order c){
+        //iterate over stock here
+        Iterator<Stock> iterStock = availableStocks.iterator();
+        while (iterStock.hasNext()) {
+            Stock stock = (Stock) iterStock.next();
+            Iterator<Item> iterItem = stock.getItems().iterator();
+            while (iterItem.hasNext()) {
+                Item item = (Item) iterItem.next();
+                int currentSelectedStock = item.getTotal();
+                String category = item.getCategory();
+                String name = item.getFruit().getName();
+                if(category.equalsIgnoreCase(c.getCategory()) && name.equalsIgnoreCase(c.getName())){
+                    if(item.isInStock()){
+                        //deduct the stock here
+                        currentSelectedStock = currentSelectedStock - c.getTotal();
+                        //checking into new list
+                        Item updatedItem = new Item();
+                        updatedItem.setCategory(category);
+                        updatedItem.setFruit(item.getFruit());
+                        updatedItem.setTotal(currentSelectedStock);
+                        if(currentSelectedStock == 0){
+                            updatedItem.setInStock(false);
+                        }
+                        progressItems.add(updatedItem);
+                        break;
+                    }
+                } else {
+                    //check if previous item already there
+                    Iterator<Item> iter = progressItems.iterator();
+                    while (iter.hasNext()) {
+                        Item it = (Item) iter.next();
+                        if(!name.equalsIgnoreCase(it.getFruit().getName())){
+                            //checking into new list
+                            Item updatedItem = new Item();
+                            updatedItem.setCategory(category);
+                            updatedItem.setFruit(item.getFruit());
+                            updatedItem.setTotal(currentSelectedStock);
+                            progressIdleItems.add(updatedItem);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void mandaCartScenario() throws Exception {
+        try {
+            log.debug("manda cart scenario");
+
+            Cart mandaSelectedCart = gson.fromJson(mandaCart, Cart.class);
+
+            if(mandaSelectedCart.getActionType().equalsIgnoreCase(XConstants.ACTION_CART)){
+                Stock progressStock = new Stock();
+                List<Item> progressItems = new ArrayList<>();
+                List<Item> progressIdleItems = new ArrayList<>();
+                List<Item> selectedItems = new ArrayList<>();
+                Iterator<Stock> iterStock = null;
+                for(Order c: mandaSelectedCart.getCart()){
+                    //iterate over stock here
+                    iterStock = checkStockNew(progressItems, selectedItems, progressIdleItems, c);
+                }
+                if(progressIdleItems.size() > 0){
+                    for(Item idleItem : progressIdleItems){
+                        progressItems.add(idleItem);
+                    }
+                }
+                selectedMandaCart.add(selectedItems);
+                progressStock.setItems(progressItems);
+                progressStock.setWarehouse(initalStock.getWarehouse());
+//                lastStock.remove(initalStock);
+                iterStock.remove();
+                availableStocks.add(progressStock); //update last stock
+            }
+
+            log.debug("manda cart scenario end");
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void susanCartScenario() throws Exception {
+        try {
+            log.debug("susan cart scenario");
+
+            Cart susanSelectedItems = gson.fromJson(susanCart, Cart.class);
+
+            if(susanSelectedItems.getActionType().equalsIgnoreCase(XConstants.ACTION_CART)){
+                Stock progressStock = new Stock();
+                List<Item> progressItems = new ArrayList<>();
+                List<Item> progressIdleItems = new ArrayList<>();
+                List<Item> selectedItems = new ArrayList<>();
+                Iterator<Stock> iterStock = null;
+                for(Order c: susanSelectedItems.getCart()){
+                    //iterate over stock here
+                    iterStock = checkStockNew(progressItems, selectedItems, progressIdleItems, c);
+                }
+                if(progressIdleItems.size() > 0){
+                    for(Item idleItem : progressIdleItems){
+                        progressItems.add(idleItem);
+                    }
+                }
+                selectedSusanCart.add(selectedItems);
+                progressStock.setItems(progressItems);
+                progressStock.setWarehouse(initalStock.getWarehouse());
+//                lastStock.remove(initalStock);
+                iterStock.remove();
+                availableStocks.add(progressStock); //update last stock
+            }
+
+            log.debug("cart scenario end");
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void selectingScenario() throws Exception {
+        try {
+            log.debug("selecting scenario");
+            mandaCartScenario();
+            susanCartScenario();
+            printCartStatus();
+            printStockStatus();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void printCartStatus(){
+        System.out.println("---------------------");
+        System.out.println("CART STATUS");
+        System.out.println("---------------------");
+
+        //print manda cart
+        System.out.println("manda cart");
+        for(List<Item> items :selectedMandaCart){
+            for(Item item: items){
+                String category = item.getCategory();
+                String name = item.getFruit().getName();
+                int total = item.getTotal();
+                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+            }
+        }
+
+        //print susan cart
+        System.out.println("---------------------");
+        System.out.println("susan cart");
+        for(List<Item> items :selectedSusanCart){
+            for(Item item: items){
+                String category = item.getCategory();
+                String name = item.getFruit().getName();
+                int total = item.getTotal();
+                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+            }
+        }
+    }
+
+    public void printStockStatus(){
+        //print status stocks
+        Iterator<Stock> currentStock = availableStocks.iterator();
+        while (currentStock.hasNext()) {
+            Stock stock = (Stock) currentStock.next();
+            System.out.println("---------------------");
+            System.out.println("STOCK STATUS");
+            System.out.println("---------------------");
+            System.out.println("Inventory Location : "+stock.getWarehouse());
+            for(Item item: stock.getItems()){
+                String category = item.getCategory();
+                String name = item.getFruit().getName();
+                int total = item.getTotal();
+                System.out.println("Items Available : "+name+ " | category : "+category+ " | total : "+total);
+            }
         }
     }
 

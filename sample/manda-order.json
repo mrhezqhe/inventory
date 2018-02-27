@@ -1,16 +1,18 @@
 {
-	"order": {
-		"items": [{
-				"name": "Apel",
-				"category": "Fruit",
-				"total": 2
-			},
-			{
-				"fruit": "Mangga",
-				"category": "Fruit",
-				"total": 4
-			}
-		]
+	"cart": [
+		{
+			"name": "Apel",
+			"category": "FRUIT",
+			"total": 2
+		},
+		{
+			"name": "Mangga",
+			"category": "FRUIT",
+			"total": 4
+		}
+	],
+	"customerId": {
+		"name": "manda"
 	},
-	"customerId": "manda"
+	"actionType": "ORDERING"
 }

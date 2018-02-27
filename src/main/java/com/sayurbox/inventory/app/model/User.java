@@ -1,20 +1,16 @@
 package com.sayurbox.inventory.app.model;
 
+import com.sayurbox.inventory.app.stock.Observer;
+
 /**
  * @author mrhezqhez@gmail.com
  */
-public class User {
+public class User implements Observer {
 
-    private Long id;
+    public User(String name){
+        this.name = name;
+    }
     private String name;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -24,4 +20,8 @@ public class User {
         this.name = name;
     }
 
+    @Override
+    public void update() {
+        
+    }
 }

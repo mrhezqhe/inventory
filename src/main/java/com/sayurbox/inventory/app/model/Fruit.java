@@ -38,4 +38,29 @@ public class Fruit {
         this.farmLocation = farmLocation;
     }
 
+    @Override
+    public String toString() {
+        return "Fruit{" +
+                "name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", farmLocation='" + farmLocation + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Fruit fruit = (Fruit) o;
+
+        return name.equals(fruit.name);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
 }
