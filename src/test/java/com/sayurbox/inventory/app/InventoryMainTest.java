@@ -36,6 +36,9 @@ public class InventoryMainTest {
     private LinkedHashSet<Stock> availableStocks = new LinkedHashSet<Stock>();
     private LinkedHashSet<List<Item>> selectedMandaCart = new LinkedHashSet<List<Item>>();
     private LinkedHashSet<List<Item>> selectedSusanCart = new LinkedHashSet<List<Item>>();
+    private LinkedHashSet<List<Item>> selectedMandaOrder = new LinkedHashSet<List<Item>>();
+    private LinkedHashSet<List<Item>> selectedSusanOrder = new LinkedHashSet<List<Item>>();
+    private List<Item> backToStockItems = new ArrayList<>();
 
     public InventoryMainTest() {}
 
@@ -219,6 +222,68 @@ public class InventoryMainTest {
         return iterStock;
     }
 
+    public Iterator<Stock> checkOrder(List<Item> progressItems, List<Item> selectedItems, List<Item> progressIdleItems, Order c){
+        //iterate over stock here
+        Iterator<Stock> iterStock = availableStocks.iterator();
+        while (iterStock.hasNext()) {
+            Stock stock = (Stock) iterStock.next();
+            Iterator<Item> iterItem = stock.getItems().iterator();
+            while (iterItem.hasNext()) {
+                Item item = (Item) iterItem.next();
+                int currentSelectedStock = item.getTotal();
+                String category = item.getCategory();
+                String name = item.getFruit().getName();
+                if(category.equalsIgnoreCase(c.getCategory()) && name.equalsIgnoreCase(c.getName())){
+                    if(item.isInStock()){
+                        //deduct the stock here
+                        int totalAvailableCart = 0;
+                        if(c.getTotal() > currentSelectedStock){
+                            totalAvailableCart = c.getTotal() - currentSelectedStock;
+                            currentSelectedStock = 0;
+                        } else {
+                            currentSelectedStock = currentSelectedStock - c.getTotal();
+                        }
+
+                        //checking into new list
+                        Item updatedItem = new Item();
+                        updatedItem.setCategory(category);
+                        updatedItem.setFruit(item.getFruit());
+                        updatedItem.setTotal(currentSelectedStock);
+                        if(currentSelectedStock <= 0){
+                            updatedItem.setInStock(false);
+                        }
+                        progressItems.add(updatedItem);
+
+                        //add into user
+                        updatedItem = new Item();
+                        updatedItem.setCategory(category);
+                        updatedItem.setFruit(item.getFruit());
+                        updatedItem.setTotal(c.getTotal() - totalAvailableCart);
+                        selectedItems.add(updatedItem);
+
+                        break;
+                    }
+                } else {
+                    //check if previous item already there
+                    Iterator<Item> iter = progressItems.iterator();
+                    while (iter.hasNext()) {
+                        Item it = (Item) iter.next();
+                        if(!name.equalsIgnoreCase(it.getFruit().getName())){
+                            //checking into new list
+                            Item updatedItem = new Item();
+                            updatedItem.setCategory(category);
+                            updatedItem.setFruit(item.getFruit());
+                            updatedItem.setInStock(item.isInStock());
+                            updatedItem.setTotal(currentSelectedStock);
+                            progressIdleItems.add(updatedItem);
+                        }
+                    }
+                }
+            }
+        }
+        return iterStock;
+    }
+
     public void checkStock(List<Item> progressItems, List<Item> progressIdleItems, Order c){
         //iterate over stock here
         Iterator<Stock> iterStock = availableStocks.iterator();
@@ -331,7 +396,153 @@ public class InventoryMainTest {
                 availableStocks.add(progressStock); //update last stock
             }
 
-            log.debug("cart scenario end");
+            log.debug("susan cart scenario end");
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void mandaOrderScenario() throws Exception {
+        try {
+            log.debug("manda order scenario");
+
+            Cart mandaSelectedCart = gson.fromJson(mandaOrder, Cart.class);
+
+            if(mandaSelectedCart.getActionType().equalsIgnoreCase(XConstants.ACTION_ORDER)){
+                Stock progressStock = new Stock();
+                List<Item> selectedOrderItems = new ArrayList<>();
+                for(Order c: mandaSelectedCart.getCart()){ //order data
+                    //iterate over selected cart here
+                    Iterator<List<Item>> it = selectedMandaCart.iterator();
+                    while (it.hasNext()) {
+                        List<Item> listItem = (List<Item>) it.next();
+                        Iterator<Item> itItem = listItem.iterator();
+                        while (itItem.hasNext()) {
+                            Item theItem = (Item) itItem.next();
+                            String category = theItem.getCategory();
+                            String name = theItem.getFruit().getName();
+                            int total = theItem.getTotal();
+                            if(category.equalsIgnoreCase(c.getCategory()) && name.equalsIgnoreCase(c.getName())){
+                                //add to order table
+                                int currentOrderTotal = 0;
+                                if(total > c.getTotal()){
+                                    //customer ordering less than their available cart, insert back to stock
+                                    currentOrderTotal = total - c.getTotal();
+
+                                    //add into stock
+                                    Item refundItem = new Item();
+                                    refundItem.setCategory(category);
+                                    refundItem.setFruit(theItem.getFruit());
+                                    refundItem.setTotal(currentOrderTotal);
+                                    //add to stock
+                                    backToStockItems.add(refundItem);
+
+                                    //add to order, ready to make purchase
+                                    Item selectedItem = new Item();
+                                    selectedItem.setCategory(category);
+                                    selectedItem.setFruit(theItem.getFruit());
+                                    selectedItem.setTotal(c.getTotal());
+                                    selectedOrderItems.add(selectedItem);
+                                } else {
+                                    selectedOrderItems.add(theItem);
+                                }
+
+                                //always remove from cart
+                                itItem.remove();
+                                break;
+                            } else {
+                                //check if previous item already there
+                                Iterator<Item> iter = selectedOrderItems.iterator();
+                                while (iter.hasNext()) {
+                                    Item itemSelected = (Item) iter.next();
+                                    if(!name.equalsIgnoreCase(itemSelected.getFruit().getName())){
+                                        //insert back to stock
+                                        backToStockItems.add(theItem);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                selectedMandaOrder.add(selectedOrderItems);
+            }
+
+            log.debug("manda order scenario end");
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void susanOrderScenario() throws Exception {
+        try {
+            log.debug("susan order scenario");
+
+            Cart susanSelectedItems = gson.fromJson(susanOrder, Cart.class);
+
+            if(susanSelectedItems.getActionType().equalsIgnoreCase(XConstants.ACTION_ORDER)){
+                Stock progressStock = new Stock();
+                List<Item> selectedOrderItems = new ArrayList<>();
+                for(Order c: susanSelectedItems.getCart()){ //order data
+                    //iterate over selected cart here
+                    Iterator<List<Item>> it = selectedSusanCart.iterator();
+                    while (it.hasNext()) {
+                        List<Item> listItem = (List<Item>) it.next();
+                        Iterator<Item> itItem = listItem.iterator();
+                        while (itItem.hasNext()) {
+                            Item theItem = (Item) itItem.next();
+                            String category = theItem.getCategory();
+                            String name = theItem.getFruit().getName();
+                            int total = theItem.getTotal();
+                            if(category.equalsIgnoreCase(c.getCategory()) && name.equalsIgnoreCase(c.getName())){
+                                //add to order table
+                                int currentOrderTotal = 0;
+                                if(total > c.getTotal()){
+                                    //customer ordering less than their available cart, insert back to stock
+                                    currentOrderTotal = total - c.getTotal();
+
+                                    //add into stock
+                                    Item refundItem = new Item();
+                                    refundItem.setCategory(category);
+                                    refundItem.setFruit(theItem.getFruit());
+                                    refundItem.setTotal(currentOrderTotal);
+                                    //add to stock
+                                    backToStockItems.add(refundItem);
+
+                                    //add to order, ready to make purchase
+                                    Item selectedItem = new Item();
+                                    selectedItem.setCategory(category);
+                                    selectedItem.setFruit(theItem.getFruit());
+                                    selectedItem.setTotal(c.getTotal());
+                                    selectedOrderItems.add(selectedItem);
+                                } else {
+                                    selectedOrderItems.add(theItem);
+                                }
+
+                                //always remove from cart
+                                itItem.remove();
+                                break;
+                            } else {
+                                //check if previous item already there
+                                Iterator<Item> iter = selectedOrderItems.iterator();
+                                while (iter.hasNext()) {
+                                    Item itemSelected = (Item) iter.next();
+                                    if(!name.equalsIgnoreCase(itemSelected.getFruit().getName())){
+                                        //insert back to stock
+                                        backToStockItems.add(theItem);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                selectedSusanOrder.add(selectedOrderItems);
+            }
+
+            log.debug("susan order scenario end");
 
         }catch (Exception e){
             e.printStackTrace();
@@ -350,6 +561,42 @@ public class InventoryMainTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void orderingScenario() throws Exception {
+        try {
+            log.debug("ordering scenario");
+            selectingScenario();
+
+            mandaOrderScenario();
+            susanOrderScenario();
+            assigningStock();
+            printOrderStatus();
+            printStockStatus();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void assigningStock(){
+        if(backToStockItems.size() > 0){
+            Stock progressStock = new Stock();
+            progressStock.setItems(backToStockItems);
+            progressStock.setWarehouse(initalStock.getWarehouse());
+            removeStock();
+            availableStocks.add(progressStock); //update last stock
+        }
+    }
+
+    public void removeStock(){
+        Iterator<Stock> currentStock = availableStocks.iterator();
+        while (currentStock.hasNext()) {
+            Stock stockNow = (Stock) currentStock.next();
+            System.out.println("updating stock...");
+            currentStock.remove();
+        }
+    }
+
 
     public void printCartStatus(){
         System.out.println("---------------------");
@@ -380,6 +627,35 @@ public class InventoryMainTest {
         }
     }
 
+    public void printOrderStatus(){
+        System.out.println("---------------------");
+        System.out.println("ORDER STATUS");
+        System.out.println("---------------------");
+
+        //print manda cart
+        System.out.println("manda order");
+        for(List<Item> items :selectedMandaOrder){
+            for(Item item: items){
+                String category = item.getCategory();
+                String name = item.getFruit().getName();
+                int total = item.getTotal();
+                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+            }
+        }
+
+        //print susan cart
+        System.out.println("---------------------");
+        System.out.println("susan order");
+        for(List<Item> items :selectedSusanOrder){
+            for(Item item: items){
+                String category = item.getCategory();
+                String name = item.getFruit().getName();
+                int total = item.getTotal();
+                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+            }
+        }
+    }
+
     public void printStockStatus(){
         //print status stocks
         Iterator<Stock> currentStock = availableStocks.iterator();
@@ -398,15 +674,7 @@ public class InventoryMainTest {
         }
     }
 
-    @Test
-    public void orderingScenario() throws Exception {
-        try {
-            log.debug("ordering scenario");
 
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 
     private File getCwd() {
         return new File("").getAbsoluteFile();
