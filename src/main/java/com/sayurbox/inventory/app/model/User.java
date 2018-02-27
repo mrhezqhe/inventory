@@ -1,11 +1,9 @@
 package com.sayurbox.inventory.app.model;
 
-import com.sayurbox.inventory.app.stock.Observer;
-
 /**
  * @author mrhezqhez@gmail.com
  */
-public class User implements Observer {
+public class User {
 
     public User(String name){
         this.name = name;
@@ -20,8 +18,4 @@ public class User implements Observer {
         this.name = name;
     }
 
-    @Override
-    public void update() {
-        
-    }
 }

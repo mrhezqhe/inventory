@@ -32,7 +32,6 @@ public class InventoryMainTest {
     private String susanOrder;
     private String mandaOrder;
 
-    private HashSet<Stock> lastStock = new HashSet<Stock>();
     private LinkedHashSet<Stock> availableStocks = new LinkedHashSet<Stock>();
     private LinkedHashSet<List<Item>> selectedMandaCart = new LinkedHashSet<List<Item>>();
     private LinkedHashSet<List<Item>> selectedSusanCart = new LinkedHashSet<List<Item>>();
@@ -61,7 +60,6 @@ public class InventoryMainTest {
             String contentStock = new String(Files.readAllBytes(Paths.get(stockFile)));
             initalStock = gson.fromJson(contentStock, Stock.class);
             availableStocks.add(initalStock);
-            lastStock.add(initalStock);
             System.out.println("sample stock data object : "+initalStock);
 
             mandaCart = new String(Files.readAllBytes(Paths.get(mandaCartFile)));
@@ -354,7 +352,6 @@ public class InventoryMainTest {
                 selectedMandaCart.add(selectedItems);
                 progressStock.setItems(progressItems);
                 progressStock.setWarehouse(initalStock.getWarehouse());
-//                lastStock.remove(initalStock);
                 iterStock.remove();
                 availableStocks.add(progressStock); //update last stock
             }
@@ -371,15 +368,15 @@ public class InventoryMainTest {
         try {
             log.debug("susan cart scenario");
 
-            Cart susanSelectedItems = gson.fromJson(susanCart, Cart.class);
+            Cart susanSelectedCart = gson.fromJson(susanCart, Cart.class);
 
-            if(susanSelectedItems.getActionType().equalsIgnoreCase(XConstants.ACTION_CART)){
+            if(susanSelectedCart.getActionType().equalsIgnoreCase(XConstants.ACTION_CART)){
                 Stock progressStock = new Stock();
                 List<Item> progressItems = new ArrayList<>();
                 List<Item> progressIdleItems = new ArrayList<>();
                 List<Item> selectedItems = new ArrayList<>();
                 Iterator<Stock> iterStock = null;
-                for(Order c: susanSelectedItems.getCart()){
+                for(Order c: susanSelectedCart.getCart()){
                     //iterate over stock here
                     iterStock = checkStockNew(progressItems, selectedItems, progressIdleItems, c);
                 }
@@ -391,7 +388,7 @@ public class InventoryMainTest {
                 selectedSusanCart.add(selectedItems);
                 progressStock.setItems(progressItems);
                 progressStock.setWarehouse(initalStock.getWarehouse());
-//                lastStock.remove(initalStock);
+
                 iterStock.remove();
                 availableStocks.add(progressStock); //update last stock
             }
@@ -481,12 +478,12 @@ public class InventoryMainTest {
         try {
             log.debug("susan order scenario");
 
-            Cart susanSelectedItems = gson.fromJson(susanOrder, Cart.class);
+            Cart susanSelectedCart = gson.fromJson(susanOrder, Cart.class);
 
-            if(susanSelectedItems.getActionType().equalsIgnoreCase(XConstants.ACTION_ORDER)){
+            if(susanSelectedCart.getActionType().equalsIgnoreCase(XConstants.ACTION_ORDER)){
                 Stock progressStock = new Stock();
                 List<Item> selectedOrderItems = new ArrayList<>();
-                for(Order c: susanSelectedItems.getCart()){ //order data
+                for(Order c: susanSelectedCart.getCart()){ //order data
                     //iterate over selected cart here
                     Iterator<List<Item>> it = selectedSusanCart.iterator();
                     while (it.hasNext()) {

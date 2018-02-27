@@ -1,13 +1,11 @@
 package com.sayurbox.inventory.app.model;
 
-import com.sayurbox.inventory.app.stock.Observable;
-
 import java.util.List;
 
 /**
  * @author mrhezqhez@gmail.com
  */
-public class Stock implements Observable {
+public class Stock {
 
     @Override
     public String toString() {
@@ -50,21 +48,6 @@ public class Stock implements Observable {
 
     public void setWarehouse(String warehouse) {
         this.warehouse = warehouse;
-    }
-
-    @Override
-    public void addObserver(Item item) {
-        items.add(item);
-    }
-
-    @Override
-    public void removeObserver(Item item) {
-        items.remove(item);
-    }
-
-    @Override
-    public void notifyObserver() {
-
     }
 
 }

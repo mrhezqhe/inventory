@@ -11,8 +11,8 @@ Steps :
 10. Summary data
 
 Scenarios :
-1. Selecting insert into cart data
-2. Ordering insert into order data
+1. Selecting, insert into cart data
+2. Ordering, insert into order data
 3. Determining whether total item for purchase order same as cart data
 4. Assigning back to stock, if available
 5. Check Stock Status
