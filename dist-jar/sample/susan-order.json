@@ -1,0 +1,18 @@
+{
+	"cart": [
+		{
+			"name": "Apel",
+			"category": "FRUIT",
+			"total": 5
+		},
+		{
+			"name": "Pepaya",
+			"category": "FRUIT",
+			"total": 1
+		}
+	],
+    "customerId": {
+      "name": "susan"
+    },
+	"actionType": "ORDERING"
+}

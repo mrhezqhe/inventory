@@ -1,0 +1,18 @@
+{
+	"cart": [
+		{
+			"name": "Apel",
+			"category": "FRUIT",
+			"total": 2
+		},
+		{
+			"name": "Mangga",
+			"category": "FRUIT",
+			"total": 4
+		}
+	],
+	"customerId": {
+		"name": "manda"
+	},
+	"actionType": "ORDERING"
+}

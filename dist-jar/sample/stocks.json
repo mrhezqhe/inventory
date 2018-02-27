@@ -1,0 +1,25 @@
+{
+  "items": [{
+    "fruit": {
+      "name": "Apel",
+      "farmLocation": "Malang"
+    },
+    "category": "FRUIT",
+    "total": 5
+  }, {
+    "fruit": {
+      "name": "Pepaya",
+      "farmLocation": "California"
+    },
+    "category": "FRUIT",
+    "total": 1
+  }, {
+    "fruit": {
+      "name": "Mangga",
+      "farmLocation": "Indramayu"
+    },
+    "category": "FRUIT",
+    "total": 4
+  }],
+  "warehouse": "Jakarta"
+}

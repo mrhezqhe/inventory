@@ -34,9 +34,12 @@ public class Init {
 
     public Init(){
         try {
+
             String stockFile = FunctionUtil.getCwd().getAbsolutePath()+"/sample/stocks.json";
+
             String mandaCartFile = FunctionUtil.getCwd().getAbsolutePath()+"/sample/manda-cart.json";
             String susanCartFile = FunctionUtil.getCwd().getAbsolutePath()+"/sample/susan-cart.json";
+
             String mandaOrderFile = FunctionUtil.getCwd().getAbsolutePath()+"/sample/manda-order.json";
             String susanOrderFile = FunctionUtil.getCwd().getAbsolutePath()+"/sample/susan-order.json";
 

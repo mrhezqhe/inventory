@@ -1,0 +1,143 @@
+------------------------------------------------------------------------ scenario : order total same as cart total
+
+---------------------
+CART STATUS
+---------------------
+manda cart
+item : Apel | category : FRUIT | total : 2
+item : Mangga | category : FRUIT | total : 4
+---------------------
+susan cart
+item : Apel | category : FRUIT | total : 3
+item : Pepaya | category : FRUIT | total : 1
+---------------------
+STOCK STATUS
+---------------------
+Inventory Location : Jakarta
+Items Available : Apel | category : FRUIT | total : 0
+Items Available : Pepaya | category : FRUIT | total : 0
+Items Available : Mangga | category : FRUIT | total : 0
+---------------------
+ORDER STATUS
+---------------------
+manda order
+item : Apel | category : FRUIT | total : 2
+item : Mangga | category : FRUIT | total : 4
+---------------------
+susan order
+item : Apel | category : FRUIT | total : 3
+item : Pepaya | category : FRUIT | total : 1
+---------------------
+STOCK STATUS
+---------------------
+Inventory Location : Jakarta
+Items Available : Apel | category : FRUIT | total : 0
+Items Available : Pepaya | category : FRUIT | total : 0
+Items Available : Mangga | category : FRUIT | total : 0
+
+
+------------------------------------------------------------------------ scenario : order total less than cart total
+
+---------------------
+CART STATUS
+---------------------
+manda cart
+item : Apel | category : FRUIT | total : 2
+item : Mangga | category : FRUIT | total : 4
+---------------------
+susan cart
+item : Apel | category : FRUIT | total : 3
+item : Pepaya | category : FRUIT | total : 1
+---------------------
+STOCK STATUS
+---------------------
+Inventory Location : Jakarta
+Items Available : Apel | category : FRUIT | total : 0
+Items Available : Pepaya | category : FRUIT | total : 0
+Items Available : Mangga | category : FRUIT | total : 0
+updating stock...
+---------------------
+ORDER STATUS
+---------------------
+manda order
+item : Apel | category : FRUIT | total : 1
+item : Mangga | category : FRUIT | total : 4
+---------------------
+susan order
+item : Apel | category : FRUIT | total : 3
+item : Pepaya | category : FRUIT | total : 0
+---------------------
+STOCK STATUS
+---------------------
+Inventory Location : Jakarta
+Items Available : Apel | category : FRUIT | total : 1
+Items Available : Pepaya | category : FRUIT | total : 1
+
+
+------------------------------------------------------------------------ scenario : order total same as cart total
+
+
+---------------------
+CART STATUS
+---------------------
+manda cart
+item : Apel | category : FRUIT | total : 2
+item : Mangga | category : FRUIT | total : 4
+---------------------
+susan cart
+---------------------
+STOCK STATUS
+---------------------
+Inventory Location : Jakarta
+Items Available : Apel | category : FRUIT | total : 3
+Items Available : Mangga | category : FRUIT | total : 0
+Items Available : Pepaya | category : FRUIT | total : 1
+---------------------
+CART STATUS
+---------------------
+manda cart
+item : Apel | category : FRUIT | total : 2
+item : Mangga | category : FRUIT | total : 4
+---------------------
+susan cart
+item : Apel | category : FRUIT | total : 3
+item : Pepaya | category : FRUIT | total : 1
+---------------------
+STOCK STATUS
+---------------------
+Inventory Location : Jakarta
+Items Available : Apel | category : FRUIT | total : 0
+Items Available : Pepaya | category : FRUIT | total : 0
+Items Available : Mangga | category : FRUIT | total : 0
+---------------------
+ORDER STATUS
+---------------------
+manda order
+item : Apel | category : FRUIT | total : 2
+item : Mangga | category : FRUIT | total : 4
+---------------------
+susan order
+---------------------
+STOCK STATUS
+---------------------
+Inventory Location : Jakarta
+Items Available : Apel | category : FRUIT | total : 0
+Items Available : Pepaya | category : FRUIT | total : 0
+Items Available : Mangga | category : FRUIT | total : 0
+---------------------
+ORDER STATUS
+---------------------
+manda order
+item : Apel | category : FRUIT | total : 2
+item : Mangga | category : FRUIT | total : 4
+---------------------
+susan order
+item : Apel | category : FRUIT | total : 3
+item : Pepaya | category : FRUIT | total : 1
+---------------------
+STOCK STATUS
+---------------------
+Inventory Location : Jakarta
+Items Available : Apel | category : FRUIT | total : 0
+Items Available : Pepaya | category : FRUIT | total : 0
+Items Available : Mangga | category : FRUIT | total : 0
