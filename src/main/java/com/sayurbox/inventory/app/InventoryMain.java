@@ -24,17 +24,11 @@ public class InventoryMain {
             User manda = new User("manda");
             User susan = new User("susan");
 
-            new CartManager(manager, manda);
-            manager.selecting();
+            new CartManager(manager, manda).doSelect();
+            new CartManager(manager, susan).doSelect();
 
-            new CartManager(manager, susan);
-            manager.selecting();
-
-            new OrderManager(manager, manda);
-            manager.ordering();
-
-            new OrderManager(manager, susan);
-            manager.ordering();
+            new OrderManager(manager, manda).doOrder();
+            new OrderManager(manager, susan).doOrder();
 
         } catch (Exception e){
             e.printStackTrace();

@@ -26,8 +26,13 @@ public class OrderManager implements Observer {
     }
 
     @Override
-    public void update() {
+    public void doSelect() {
+        inventoryManager.selecting();
+    }
 
+    @Override
+    public void doOrder() {
+        inventoryManager.ordering();
     }
 
 }

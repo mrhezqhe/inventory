@@ -60,20 +60,20 @@ public class InventoryMainTest {
             String contentStock = new String(Files.readAllBytes(Paths.get(stockFile)));
             initalStock = gson.fromJson(contentStock, Stock.class);
             availableStocks.add(initalStock);
-            System.out.println("sample stock data object : "+initalStock);
+            log.debug("sample stock data object : "+initalStock);
 
             mandaCart = new String(Files.readAllBytes(Paths.get(mandaCartFile)));
-            System.out.println("mandaCart = "+mandaCart);
+            log.debug("mandaCart = "+mandaCart);
             susanCart = new String(Files.readAllBytes(Paths.get(susanCartFile)));
-            System.out.println("susanCart = "+susanCart);
+            log.debug("susanCart = "+susanCart);
 
             mandaOrder = new String(Files.readAllBytes(Paths.get(mandaOrderFile)));
-            System.out.println("mandaOrder = "+mandaOrder);
+            log.debug("mandaOrder = "+mandaOrder);
             susanOrder = new String(Files.readAllBytes(Paths.get(susanOrderFile)));
-            System.out.println("susanOrder = "+susanOrder);
+            log.debug("susanOrder = "+susanOrder);
 
             initalContentStock = gson.toJson(initalStock);
-            System.out.println("sample stock data content : "+initalContentStock);
+            log.debug("sample stock data content : "+initalContentStock);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -113,7 +113,7 @@ public class InventoryMainTest {
             newStock.setWarehouse("Jakarta");
 
             String output = gson.toJson(newStock);
-            System.out.println("result : "+output);
+            log.debug("result : "+output);
 
             Stock responseStock = gson.fromJson(output, Stock.class);
 
@@ -122,11 +122,11 @@ public class InventoryMainTest {
                 String farmLocation = item.getFruit().getFarmLocation();
                 int total = item.getTotal();
                 String category = item.getCategory();
-                System.out.println("name : "+name+ " | farmLocation : "+farmLocation+ " | total : "+total+ " | category : "+category);
+                log.debug("name : "+name+ " | farmLocation : "+farmLocation+ " | total : "+total+ " | category : "+category);
             }
 
             String warehouse = responseStock.getWarehouse();
-            System.out.println("warehouse : "+warehouse);
+            log.debug("warehouse : "+warehouse);
 
             //start selecting
             Cart newCart = new Cart();
@@ -148,7 +148,7 @@ public class InventoryMainTest {
             newCart.setActionType(XConstants.ACTION_CART);
 
             String outputnewCart = gson.toJson(newCart);
-            System.out.println("result outputnewCart : "+outputnewCart);
+            log.debug("result outputnewCart : "+outputnewCart);
 
             Cart mandaSelectedItems = gson.fromJson(mandaCart, Cart.class);
             Cart susanSelectedItems = gson.fromJson(susanCart, Cart.class);
@@ -158,7 +158,7 @@ public class InventoryMainTest {
         }
     }
 
-    public Iterator<Stock> checkStockNew(List<Item> progressItems, List<Item> selectedItems, List<Item> progressIdleItems, Order c){
+    public Iterator<Stock> checkStock(List<Item> progressItems, List<Item> selectedItems, List<Item> progressIdleItems, Order c){
         //iterate over stock here
         Iterator<Stock> iterStock = availableStocks.iterator();
         while (iterStock.hasNext()) {
@@ -282,51 +282,6 @@ public class InventoryMainTest {
         return iterStock;
     }
 
-    public void checkStock(List<Item> progressItems, List<Item> progressIdleItems, Order c){
-        //iterate over stock here
-        Iterator<Stock> iterStock = availableStocks.iterator();
-        while (iterStock.hasNext()) {
-            Stock stock = (Stock) iterStock.next();
-            Iterator<Item> iterItem = stock.getItems().iterator();
-            while (iterItem.hasNext()) {
-                Item item = (Item) iterItem.next();
-                int currentSelectedStock = item.getTotal();
-                String category = item.getCategory();
-                String name = item.getFruit().getName();
-                if(category.equalsIgnoreCase(c.getCategory()) && name.equalsIgnoreCase(c.getName())){
-                    if(item.isInStock()){
-                        //deduct the stock here
-                        currentSelectedStock = currentSelectedStock - c.getTotal();
-                        //checking into new list
-                        Item updatedItem = new Item();
-                        updatedItem.setCategory(category);
-                        updatedItem.setFruit(item.getFruit());
-                        updatedItem.setTotal(currentSelectedStock);
-                        if(currentSelectedStock == 0){
-                            updatedItem.setInStock(false);
-                        }
-                        progressItems.add(updatedItem);
-                        break;
-                    }
-                } else {
-                    //check if previous item already there
-                    Iterator<Item> iter = progressItems.iterator();
-                    while (iter.hasNext()) {
-                        Item it = (Item) iter.next();
-                        if(!name.equalsIgnoreCase(it.getFruit().getName())){
-                            //checking into new list
-                            Item updatedItem = new Item();
-                            updatedItem.setCategory(category);
-                            updatedItem.setFruit(item.getFruit());
-                            updatedItem.setTotal(currentSelectedStock);
-                            progressIdleItems.add(updatedItem);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     @Test
     public void mandaCartScenario() throws Exception {
         try {
@@ -342,7 +297,7 @@ public class InventoryMainTest {
                 Iterator<Stock> iterStock = null;
                 for(Order c: mandaSelectedCart.getCart()){
                     //iterate over stock here
-                    iterStock = checkStockNew(progressItems, selectedItems, progressIdleItems, c);
+                    iterStock = checkStock(progressItems, selectedItems, progressIdleItems, c);
                 }
                 if(progressIdleItems.size() > 0){
                     for(Item idleItem : progressIdleItems){
@@ -378,7 +333,7 @@ public class InventoryMainTest {
                 Iterator<Stock> iterStock = null;
                 for(Order c: susanSelectedCart.getCart()){
                     //iterate over stock here
-                    iterStock = checkStockNew(progressItems, selectedItems, progressIdleItems, c);
+                    iterStock = checkStock(progressItems, selectedItems, progressIdleItems, c);
                 }
                 if(progressIdleItems.size() > 0){
                     for(Item idleItem : progressIdleItems){
@@ -564,7 +519,6 @@ public class InventoryMainTest {
         try {
             log.debug("ordering scenario");
             selectingScenario();
-
             mandaOrderScenario();
             susanOrderScenario();
             assigningStock();
@@ -589,66 +543,90 @@ public class InventoryMainTest {
         Iterator<Stock> currentStock = availableStocks.iterator();
         while (currentStock.hasNext()) {
             Stock stockNow = (Stock) currentStock.next();
-            System.out.println("updating stock...");
+            log.debug("updating stock...");
             currentStock.remove();
         }
     }
 
 
     public void printCartStatus(){
-        System.out.println("---------------------");
-        System.out.println("CART STATUS");
-        System.out.println("---------------------");
+        log.debug("---------------------");
+        log.debug("CART STATUS");
+        log.debug("---------------------");
 
         //print manda cart
-        System.out.println("manda cart");
+        log.debug("manda cart");
         for(List<Item> items :selectedMandaCart){
             for(Item item: items){
                 String category = item.getCategory();
                 String name = item.getFruit().getName();
                 int total = item.getTotal();
-                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+                log.debug("item : "+name+ " | category : "+category+ " | total : "+total);
+                //check
+                if(name.equalsIgnoreCase("Apel")){
+                    Assert.assertEquals(total, 2);
+                } else if(name.equalsIgnoreCase("Mangga")){
+                    Assert.assertEquals(total, 4);
+                }
             }
         }
 
         //print susan cart
-        System.out.println("---------------------");
-        System.out.println("susan cart");
+        log.debug("---------------------");
+        log.debug("susan cart");
         for(List<Item> items :selectedSusanCart){
             for(Item item: items){
                 String category = item.getCategory();
                 String name = item.getFruit().getName();
                 int total = item.getTotal();
-                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+                log.debug("item : "+name+ " | category : "+category+ " | total : "+total);
+                //check
+                if(name.equalsIgnoreCase("Apel")){
+                    Assert.assertEquals(total, 3);
+                } else if(name.equalsIgnoreCase("Pepaya")){
+                    Assert.assertEquals(total, 1);
+                }
             }
         }
     }
 
     public void printOrderStatus(){
-        System.out.println("---------------------");
-        System.out.println("ORDER STATUS");
-        System.out.println("---------------------");
+        log.debug("---------------------");
+        log.debug("ORDER STATUS");
+        log.debug("---------------------");
 
         //print manda cart
-        System.out.println("manda order");
+        log.debug("manda order");
         for(List<Item> items :selectedMandaOrder){
             for(Item item: items){
                 String category = item.getCategory();
                 String name = item.getFruit().getName();
                 int total = item.getTotal();
-                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+                log.debug("item : "+name+ " | category : "+category+ " | total : "+total);
+                //check
+                if(name.equalsIgnoreCase("Apel")){
+                    Assert.assertEquals(total, 2);
+                } else if(name.equalsIgnoreCase("Mangga")){
+                    Assert.assertEquals(total, 4);
+                }
             }
         }
 
         //print susan cart
-        System.out.println("---------------------");
-        System.out.println("susan order");
+        log.debug("---------------------");
+        log.debug("susan order");
         for(List<Item> items :selectedSusanOrder){
             for(Item item: items){
                 String category = item.getCategory();
                 String name = item.getFruit().getName();
                 int total = item.getTotal();
-                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+                log.debug("item : "+name+ " | category : "+category+ " | total : "+total);
+                //check
+                if(name.equalsIgnoreCase("Apel")){
+                    Assert.assertEquals(total, 3);
+                } else if(name.equalsIgnoreCase("Pepaya")){
+                    Assert.assertEquals(total, 1);
+                }
             }
         }
     }
@@ -658,20 +636,19 @@ public class InventoryMainTest {
         Iterator<Stock> currentStock = availableStocks.iterator();
         while (currentStock.hasNext()) {
             Stock stock = (Stock) currentStock.next();
-            System.out.println("---------------------");
-            System.out.println("STOCK STATUS");
-            System.out.println("---------------------");
-            System.out.println("Inventory Location : "+stock.getWarehouse());
+            log.debug("---------------------");
+            log.debug("STOCK STATUS");
+            log.debug("---------------------");
+            log.debug("Inventory Location : "+stock.getWarehouse());
             for(Item item: stock.getItems()){
                 String category = item.getCategory();
                 String name = item.getFruit().getName();
                 int total = item.getTotal();
-                System.out.println("Items Available : "+name+ " | category : "+category+ " | total : "+total);
+                log.debug("Items Available : "+name+ " | category : "+category+ " | total : "+total);
+                Assert.assertEquals(total, 0); //according to Document, available stock should be 0
             }
         }
     }
-
-
 
     private File getCwd() {
         return new File("").getAbsoluteFile();

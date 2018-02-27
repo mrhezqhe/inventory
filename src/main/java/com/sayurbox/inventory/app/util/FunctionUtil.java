@@ -3,6 +3,7 @@ package com.sayurbox.inventory.app.util;
 import com.sayurbox.inventory.app.model.Item;
 import com.sayurbox.inventory.app.model.Order;
 import com.sayurbox.inventory.app.model.Stock;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.Iterator;
@@ -14,6 +15,8 @@ import java.util.List;
  */
 public class FunctionUtil {
 
+    final static org.apache.log4j.Logger log = Logger.getLogger(FunctionUtil.class);
+    
     public static File getCwd() {
         return new File("").getAbsoluteFile();
     }
@@ -143,59 +146,59 @@ public class FunctionUtil {
     }
 
     public static void printCartStatus(LinkedHashSet<List<Item>> selectedMandaCart, LinkedHashSet<List<Item>> selectedSusanCart){
-        System.out.println("---------------------");
-        System.out.println("CART STATUS");
-        System.out.println("---------------------");
+        log.info("---------------------");
+        log.info("CART STATUS");
+        log.info("---------------------");
 
         //print manda cart
-        System.out.println("manda cart");
+        log.info("manda cart");
         for(List<Item> items :selectedMandaCart){
             for(Item item: items){
                 String category = item.getCategory();
                 String name = item.getFruit().getName();
                 int total = item.getTotal();
-                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+                log.info("item : "+name+ " | category : "+category+ " | total : "+total);
             }
         }
 
         //print susan cart
-        System.out.println("---------------------");
-        System.out.println("susan cart");
+        log.info("---------------------");
+        log.info("susan cart");
         for(List<Item> items :selectedSusanCart){
             for(Item item: items){
                 String category = item.getCategory();
                 String name = item.getFruit().getName();
                 int total = item.getTotal();
-                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+                log.info("item : "+name+ " | category : "+category+ " | total : "+total);
             }
         }
     }
 
-    public void printOrderStatus(LinkedHashSet<List<Item>> selectedMandaOrder, LinkedHashSet<List<Item>> selectedSusanOrder){
-        System.out.println("---------------------");
-        System.out.println("ORDER STATUS");
-        System.out.println("---------------------");
+    public static void printOrderStatus(LinkedHashSet<List<Item>> selectedMandaOrder, LinkedHashSet<List<Item>> selectedSusanOrder){
+        log.info("---------------------");
+        log.info("ORDER STATUS");
+        log.info("---------------------");
 
         //print manda cart
-        System.out.println("manda order");
+        log.info("manda order");
         for(List<Item> items :selectedMandaOrder){
             for(Item item: items){
                 String category = item.getCategory();
                 String name = item.getFruit().getName();
                 int total = item.getTotal();
-                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+                log.info("item : "+name+ " | category : "+category+ " | total : "+total);
             }
         }
 
         //print susan cart
-        System.out.println("---------------------");
-        System.out.println("susan order");
+        log.info("---------------------");
+        log.info("susan order");
         for(List<Item> items :selectedSusanOrder){
             for(Item item: items){
                 String category = item.getCategory();
                 String name = item.getFruit().getName();
                 int total = item.getTotal();
-                System.out.println("item : "+name+ " | category : "+category+ " | total : "+total);
+                log.info("item : "+name+ " | category : "+category+ " | total : "+total);
             }
         }
     }
@@ -205,15 +208,15 @@ public class FunctionUtil {
         Iterator<Stock> currentStock = availableStocks.iterator();
         while (currentStock.hasNext()) {
             Stock stock = (Stock) currentStock.next();
-            System.out.println("---------------------");
-            System.out.println("STOCK STATUS");
-            System.out.println("---------------------");
-            System.out.println("Inventory Location : "+stock.getWarehouse());
+            log.info("---------------------");
+            log.info("STOCK STATUS");
+            log.info("---------------------");
+            log.info("Inventory Location : "+stock.getWarehouse());
             for(Item item: stock.getItems()){
                 String category = item.getCategory();
                 String name = item.getFruit().getName();
                 int total = item.getTotal();
-                System.out.println("Items Available : "+name+ " | category : "+category+ " | total : "+total);
+                log.info("Items Available : "+name+ " | category : "+category+ " | total : "+total);
             }
         }
     }

@@ -5,5 +5,6 @@ package com.sayurbox.inventory.app.stock;
  *
  */
 public interface Observer {
-    public void update();
+    public void doSelect();
+    public void doOrder();
 }

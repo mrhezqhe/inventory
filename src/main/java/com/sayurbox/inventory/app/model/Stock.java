@@ -7,6 +7,25 @@ import java.util.List;
  */
 public class Stock {
 
+    private List<Item> items;
+    private String warehouse;
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
+    public String getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(String warehouse) {
+        this.warehouse = warehouse;
+    }
+
     @Override
     public String toString() {
         return "Stock{" +
@@ -29,25 +48,6 @@ public class Stock {
     @Override
     public int hashCode() {
         return warehouse.hashCode();
-    }
-
-    private List<Item> items;
-    private String warehouse;
-
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
-
-    public String getWarehouse() {
-        return warehouse;
-    }
-
-    public void setWarehouse(String warehouse) {
-        this.warehouse = warehouse;
     }
 
 }

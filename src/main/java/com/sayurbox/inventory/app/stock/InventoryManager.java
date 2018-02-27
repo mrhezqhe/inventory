@@ -18,7 +18,6 @@ public class InventoryManager {
 
     private Gson gson = new Gson();
     private List<Observer> observers = new ArrayList<>();
-    private int state;
     private Init init;
     private User user;
 
@@ -30,28 +29,19 @@ public class InventoryManager {
         observers.add(o);
     }
 
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int value) {
-        this.state = value;
-        execute();
-    }
-
-    public void selecting() {
+    public synchronized void selecting() {
         executeCart();
         printingCart();
     }
 
-    public void ordering() {
+    public synchronized void ordering() {
         executeOrder();
         printingOrder();
     }
 
     private void executeCart() {
         try {
-            log.debug("executeCart");
+            log.info("executeCart");
 
             Cart mandaSelectedCart = gson.fromJson(init.getMandaCart(), Cart.class);
             Cart susanSelectedCart = gson.fromJson(init.getSusanCart(), Cart.class);
@@ -112,7 +102,7 @@ public class InventoryManager {
 
     private void executeOrder() {
         try {
-            log.debug("executeOrder");
+            log.info("executeOrder");
 
             Cart mandaSelectedCart = gson.fromJson(init.getMandaOrder(), Cart.class);
             Cart susanSelectedCart = gson.fromJson(init.getSusanOrder(), Cart.class);
@@ -248,12 +238,8 @@ public class InventoryManager {
     }
 
     public void printingOrder() {
-        FunctionUtil.printCartStatus(init.getSelectedMandaCart(), init.getSelectedSusanCart());
+        FunctionUtil.printOrderStatus(init.getSelectedMandaOrder(), init.getSelectedSusanOrder());
         FunctionUtil.printStockStatus(init.getAvailableStocks());
-    }
-
-    private void execute() {
-        System.out.print("\n from execute: ");
     }
 
     public Init getInit() {
